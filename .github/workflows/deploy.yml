@@ -1,9 +1,11 @@
-name: Deploy to GitHub Pages
+name: Deploy environments to GitHub Pages
 
 on:
   push:
     branches:
+      - develop
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,17 +16,22 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: github-pages
+      name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Prepare Pages artifact
+        run: |
+          mkdir public
+          cp -r environments/staging public/staging
+          cp -r environments/production public/production
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.'
+          path: public
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

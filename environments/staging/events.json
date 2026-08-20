@@ -1,0 +1,29 @@
+[
+  {
+    "type": "WatchEvent",
+    "repo": {
+      "name": "github/docs",
+      "url": "https://github.com/github/docs",
+      "description": "The open-source repo for docs.github.com"
+    },
+    "created_at": "2026-08-18T09:30:00Z"
+  },
+  {
+    "type": "WatchEvent",
+    "repo": {
+      "name": "microsoft/vscode",
+      "url": "https://github.com/microsoft/vscode",
+      "description": "Visual Studio Code"
+    },
+    "created_at": "2026-08-12T15:45:00Z"
+  },
+  {
+    "type": "WatchEvent",
+    "repo": {
+      "name": "nodejs/node",
+      "url": "https://github.com/nodejs/node",
+      "description": "Node.js JavaScript runtime"
+    },
+    "created_at": "2026-08-04T11:10:00Z"
+  }
+]
