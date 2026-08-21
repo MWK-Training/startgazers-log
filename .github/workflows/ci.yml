@@ -1,4 +1,4 @@
-name: ci-validation
+name: ci-workflow
 
 on:
   pull_request:
@@ -7,5 +7,5 @@ on:
       - main
 
 jobs:
-  application-validation:
+  ci-validate-application:
     uses: ./.github/workflows/validate-application.yml

@@ -1,4 +1,4 @@
-name: validate-branch-prefix.yml
+name: validate-branch-prefix-workflow
 
 on:
   pull_request:
@@ -13,7 +13,7 @@ jobs:
   validate-branch-prefix:
     runs-on: ubuntu-latest
     steps:
-      - name: validate-branch-prefix
+      - name: Branch Prefix
         env:
           BRANCH_NAME: ${{ github.head_ref }}
         run: |

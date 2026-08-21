@@ -1,4 +1,4 @@
-name: validate-application.yml
+name: validate-application-workflow
 
 on:
   workflow_call:
