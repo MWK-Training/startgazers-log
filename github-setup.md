@@ -65,9 +65,9 @@ El pull request debe dirigirse a `develop`.
 
 Archivo: `.github/workflows/ci.yml`
 
-El workflow `CI` se ejecuta en pull requests y pushes hacia `develop` o `main`.
+El workflow `ci-validation` se ejecuta en pull requests hacia `develop` o `main`.
 
-El job se llama `validate`, por lo que GitHub muestra el check como:
+El job se llama `application-validation`, por lo que GitHub muestra el check como:
 
 ```text
 ci-validation / application-validation
@@ -80,11 +80,13 @@ Este job:
 - Valida los dos archivos `events.json`.
 - Comprueba que existan los archivos HTML y CSS de ambos ambientes.
 
+La validacion reutilizable esta definida en `.github/workflows/validate-application.yml` y se identifica internamente como `Validate-application.yml`. CI y deploy la invocan para evitar duplicar los mismos pasos.
+
 ### Validacion del nombre de rama
 
-Archivo: `.github/workflows/branch-name.yml`
+Archivo: `.github/workflows/validate-branch-prefix.yml`
 
-El workflow `branch-name.yml` se ejecuta en pull requests hacia `develop`. La rama de origen debe usar uno de estos prefijos:
+El workflow `validate-branch-prefix.yml` se ejecuta en pull requests hacia `develop`. La rama de origen debe usar uno de estos prefijos:
 
 ```text
 feature/*
@@ -92,10 +94,10 @@ fix/*
 hotfix/*
 ```
 
-El job se llama `branch-prefix`, por lo que el check aparece como:
+El job se llama `validate-branch-prefix`, por lo que el check aparece como:
 
 ```text
-branch-name.yml / branch-prefix
+validate-branch-prefix.yml / validate-branch-prefix
 ```
 
 Ejemplos validos:
@@ -180,11 +182,11 @@ En `Settings > Branches` crea una regla o ruleset para `develop` con estas opcio
 - Requerir aprobacion, si hay otro colaborador disponible.
 - Requerir que los checks pasen antes de fusionar.
 - Seleccionar el check `ci-validation / application-validation`.
-- Seleccionar el check `branch-name.yml / branch-prefix`.
+- Seleccionar el check `validate-branch-prefix.yml / validate-branch-prefix`.
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
-El check `branch-name.yml / branch-prefix` aparece despues de crear o actualizar un pull request hacia `develop`. Configuralo como requisito en la regla de `develop`; la regla de proteccion es la que impide realmente los pushes directos.
+El check `validate-branch-prefix.yml / validate-branch-prefix` aparece despues de crear o actualizar un pull request hacia `develop`. Configuralo como requisito en la regla de `develop`; la regla de proteccion es la que impide realmente los pushes directos.
 
 ### 5. Proteccion de `main`
 
