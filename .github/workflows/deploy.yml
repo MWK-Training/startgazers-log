@@ -1,10 +1,12 @@
-name: Deploy environments to GitHub Pages
+name: deploy-workflow
 
 on:
-  push:
+  pull_request:
     branches:
       - develop
       - main
+    types:
+      - closed
   workflow_dispatch:
 
 permissions:
@@ -13,18 +15,22 @@ permissions:
   id-token: write
 
 jobs:
-  validate:
-    uses: ./.github/workflows/validate.yml
+  pre-deploy-validation:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    uses: ./.github/workflows/validate-application.yml
 
   deploy:
-    needs: validate
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    needs: pre-deploy-validation
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      name: ${{ (github.event_name == 'workflow_dispatch' && github.ref_name == 'main' || github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main') && 'production' || 'staging' }}
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Prepare Pages artifact

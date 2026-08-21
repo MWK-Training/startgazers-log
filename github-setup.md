@@ -65,12 +65,12 @@ El pull request debe dirigirse a `develop`.
 
 Archivo: `.github/workflows/ci.yml`
 
-El workflow `CI` se ejecuta en pull requests y pushes hacia `develop` o `main`.
+El workflow `ci-validation` se ejecuta en pull requests hacia `develop` o `main`.
 
-El job se llama `validate`, por lo que GitHub muestra el check como:
+El job se llama `application-validation`, por lo que GitHub muestra el check como:
 
 ```text
-CI / validate
+ci-validation / application-validation
 ```
 
 Este job:
@@ -80,11 +80,13 @@ Este job:
 - Valida los dos archivos `events.json`.
 - Comprueba que existan los archivos HTML y CSS de ambos ambientes.
 
+La validacion reutilizable esta definida en `.github/workflows/validate-application.yml` y se identifica internamente como `Validate-application.yml`. CI y deploy la invocan para evitar duplicar los mismos pasos.
+
 ### Validacion del nombre de rama
 
-Archivo: `.github/workflows/branch-name.yml`
+Archivo: `.github/workflows/validate-branch-prefix.yml`
 
-El workflow `Validate branch name` se ejecuta en pull requests hacia `develop`. Solo permite ramas de origen con estos prefijos:
+El workflow `validate-branch-prefix.yml` se ejecuta en pull requests hacia `develop`. La rama de origen debe usar uno de estos prefijos:
 
 ```text
 feature/*
@@ -92,10 +94,10 @@ fix/*
 hotfix/*
 ```
 
-El job se llama `branch-name`, por lo que el check aparece como:
+El job se llama `validate-branch-prefix`, por lo que el check aparece como:
 
 ```text
-Validate branch name / branch-name
+validate-branch-prefix.yml / validate-branch-prefix
 ```
 
 Ejemplos validos:
@@ -120,9 +122,11 @@ Archivo: `.github/workflows/deploy.yml`
 
 El workflow `Deploy environments to GitHub Pages` se ejecuta:
 
-- En cada push a `develop`.
-- En cada push a `main`.
+- Cuando un pull request se fusiona en `develop`.
+- Cuando un pull request se fusiona en `main`.
 - Manualmente mediante `Actions > Deploy environments to GitHub Pages > Run workflow`.
+
+No se ejecuta por un push directo. La regla de proteccion de la rama debe impedir ese push; si alguien consigue realizarlo, tampoco publicara un ambiente porque el workflow solo acepta pull requests fusionados o una ejecucion manual.
 
 El ambiente de GitHub Actions se selecciona automáticamente:
 
@@ -177,12 +181,12 @@ En `Settings > Branches` crea una regla o ruleset para `develop` con estas opcio
 - Requerir pull request antes de fusionar.
 - Requerir aprobacion, si hay otro colaborador disponible.
 - Requerir que los checks pasen antes de fusionar.
-- Seleccionar el check `CI / validate`.
-- Seleccionar el check `Validate branch name / branch-name`.
+- Seleccionar el check `ci-validation / application-validation`.
+- Seleccionar el check `validate-branch-prefix.yml / validate-branch-prefix`.
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
-El check `Validate branch name / branch-name` aparece despues de crear o actualizar un pull request hacia `develop`. Solo permite ramas de origen `feature/*`, `fix/*` y `hotfix/*`.
+El check `validate-branch-prefix.yml / validate-branch-prefix` aparece despues de crear o actualizar un pull request hacia `develop`. Configuralo como requisito en la regla de `develop`; la regla de proteccion es la que impide realmente los pushes directos.
 
 ### 5. Proteccion de `main`
 
@@ -192,21 +196,21 @@ En `Settings > Branches` crea una regla o ruleset para `main` con estas opciones
 - Requerir al menos una aprobacion.
 - Descartar aprobaciones obsoletas cuando cambien los commits.
 - Requerir que los checks pasen antes de fusionar.
-- Seleccionar el check `CI / validate`.
+- Seleccionar el check `ci-validation / application-validation`.
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
-El check `CI / validate` puede seleccionarse despues de que el workflow `CI` haya ejecutado al menos una vez en GitHub.
+El check `ci-validation / application-validation` puede seleccionarse despues de que el workflow `ci-validation` haya ejecutado al menos una vez en GitHub.
 
 ## Promover a produccion
 
 1. Trabaja en una rama `feature/*`.
 2. Abre un pull request hacia `develop`.
-3. Espera a que `CI / validate` termine correctamente.
+3. Espera a que `ci-validation / application-validation` termine correctamente.
 4. Fusiona el pull request en `develop`.
 5. Comprueba staging en `/staging/`.
 6. Abre un pull request desde `develop` hacia `main`.
-7. Espera la aprobacion requerida y el check `CI / validate`.
+7. Espera la aprobacion requerida y el check `ci-validation / application-validation`.
 8. Fusiona el pull request en `main`.
 9. GitHub Actions ejecutara el despliegue de production.
 
@@ -229,7 +233,7 @@ git switch -c feature/nuevo-cambio
 GitHub no permite aprobar el propio pull request. Si el repositorio tiene un unico mantenedor y no hay otro usuario que pueda aprobar, hay dos alternativas:
 
 - Mantener una aprobacion obligatoria y agregar un colaborador con permiso `Write`, `Maintain` o `Admin`.
-- Cambiar el numero de aprobaciones requeridas a `0`, manteniendo obligatorio el check `CI / validate`.
+- Cambiar el numero de aprobaciones requeridas a `0`, manteniendo obligatorio el check `ci-validation / application-validation`.
 
 Para un equipo, se recomienda mantener al menos una aprobacion.
 
