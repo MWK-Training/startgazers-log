@@ -116,17 +116,31 @@ test/experiment
 adding-labels-for-branches
 ```
 
+### Validacion de promocion
+
+Archivo: `.github/workflows/validate-promotion-source.yml`
+
+El workflow `validate-promotion-source-workflow` se ejecuta en pull requests hacia `main` y solo permite que `develop` sea la rama de origen.
+
+El check aparece como:
+
+```text
+validate-promotion-source-workflow / validate-promotion-source
+```
+
+Este check debe ser obligatorio en la regla de `main`. De esta forma, un pull request desde una rama `feature/*`, `fix/*` o `hotfix/*` hacia `main` no puede fusionarse.
+
 ### Despliegue
 
 Archivo: `.github/workflows/deploy.yml`
 
-El workflow `Deploy environments to GitHub Pages` se ejecuta:
+El workflow `deploy-workflow` se ejecuta:
 
-- Cuando un pull request se fusiona en `develop`.
-- Cuando un pull request se fusiona en `main`.
+- En el push que GitHub genera despues de fusionar un pull request en `develop`.
+- En el push que GitHub genera despues de fusionar un pull request en `main`.
 - Manualmente mediante `Actions > Deploy environments to GitHub Pages > Run workflow`.
 
-No se ejecuta por un push directo. La regla de proteccion de la rama debe impedir ese push; si alguien consigue realizarlo, tampoco publicara un ambiente porque el workflow solo acepta pull requests fusionados o una ejecucion manual.
+El workflow no distingue si un push fue generado por un merge o por un push directo. Por eso, las reglas de proteccion de `develop` y `main` deben bloquear los pushes directos. El job ejecuta siempre `validate-application.yml` antes de publicar.
 
 El ambiente de GitHub Actions se selecciona automáticamente:
 
@@ -197,10 +211,13 @@ En `Settings > Branches` crea una regla o ruleset para `main` con estas opciones
 - Descartar aprobaciones obsoletas cuando cambien los commits.
 - Requerir que los checks pasen antes de fusionar.
 - Seleccionar el check `ci-validation / application-validation`.
+- Seleccionar el check `validate-promotion-source-workflow / validate-promotion-source`.
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
 El check `ci-validation / application-validation` puede seleccionarse despues de que el workflow `ci-validation` haya ejecutado al menos una vez en GitHub.
+
+El check `validate-promotion-source-workflow / validate-promotion-source` permite unicamente la promocion `develop -> main`.
 
 ## Promover a produccion
 

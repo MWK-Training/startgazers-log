@@ -1,0 +1,26 @@
+name: validate-promotion-source-workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate-promotion-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: validate-promotion-source
+        env:
+          SOURCE_BRANCH: ${{ github.head_ref }}
+        run: |
+          if [[ "$SOURCE_BRANCH" != develop ]]; then
+            echo "Invalid promotion source: $SOURCE_BRANCH"
+            echo "Only develop can be promoted to main"
+            exit 1
+          fi
+
+          echo "Valid promotion source: develop"
