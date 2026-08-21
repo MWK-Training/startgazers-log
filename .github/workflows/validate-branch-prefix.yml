@@ -1,4 +1,4 @@
-name: branch-name.yml
+name: validate-branch-prefix.yml
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  branch-prefix:
+  validate-branch-prefix:
     runs-on: ubuntu-latest
     steps:
       - name: validate-branch-prefix

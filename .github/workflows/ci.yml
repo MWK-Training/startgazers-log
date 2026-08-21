@@ -8,4 +8,4 @@ on:
 
 jobs:
   application-validation:
-    uses: ./.github/workflows/validate.yml
+    uses: ./.github/workflows/validate-application.yml
