@@ -80,6 +80,40 @@ Este job:
 - Valida los dos archivos `events.json`.
 - Comprueba que existan los archivos HTML y CSS de ambos ambientes.
 
+### Validacion del nombre de rama
+
+Archivo: `.github/workflows/branch-name.yml`
+
+El workflow `Validate branch name` se ejecuta en pull requests hacia `develop`. Solo permite ramas de origen con estos prefijos:
+
+```text
+feature/*
+fix/*
+hotfix/*
+```
+
+El job se llama `branch-name`, por lo que el check aparece como:
+
+```text
+Validate branch name / branch-name
+```
+
+Ejemplos validos:
+
+```text
+feature/adding-labels-for-branches
+fix/events-json
+hotfix/production-deploy
+```
+
+Ejemplos no validos:
+
+```text
+bugfix/events-json
+test/experiment
+adding-labels-for-branches
+```
+
 ### Despliegue
 
 Archivo: `.github/workflows/deploy.yml`
@@ -145,10 +179,13 @@ En `Settings > Branches` crea una regla o ruleset para `main` con estas opciones
 - Descartar aprobaciones obsoletas cuando cambien los commits.
 - Requerir que los checks pasen antes de fusionar.
 - Seleccionar el check `CI / validate`.
+- Seleccionar el check `Validate branch name / branch-name`.
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
 El check `CI / validate` puede seleccionarse despues de que el workflow `CI` haya ejecutado al menos una vez en GitHub.
+
+El check `Validate branch name / branch-name` aparece despues de crear o actualizar un pull request hacia `develop`. Debe configurarse como requisito unicamente en la regla de `develop`.
 
 ## Promover a produccion
 
