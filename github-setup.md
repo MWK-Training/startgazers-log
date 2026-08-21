@@ -40,7 +40,7 @@ feature/* -> pull request -> develop -> staging
 ```
 
 - `feature/*`: rama de trabajo para una funcionalidad o cambio.
-- `develop`: rama de integracion. Cada push ejecuta CI y despliega el estado en staging.
+- `develop`: rama de integracion. Cada pull request ejecuta CI y, al fusionarse, el push resultante despliega staging.
 - `main`: rama de produccion. Solo debe actualizarse mediante un pull request aprobado desde `develop`.
 
 Crear una rama de trabajo:
@@ -65,12 +65,12 @@ El pull request debe dirigirse a `develop`.
 
 Archivo: `.github/workflows/ci.yml`
 
-El workflow `ci-validation` se ejecuta en pull requests hacia `develop` o `main`.
+El workflow `ci-workflow` se ejecuta en pull requests hacia `develop` o `main`.
 
-El job se llama `application-validation`, por lo que GitHub muestra el check como:
+El job se llama `ci-validate-application`, por lo que GitHub muestra el check como:
 
 ```text
-ci-validation / application-validation
+ci-workflow / ci-validate-application
 ```
 
 Este job:
@@ -80,13 +80,13 @@ Este job:
 - Valida los dos archivos `events.json`.
 - Comprueba que existan los archivos HTML y CSS de ambos ambientes.
 
-La validacion reutilizable esta definida en `.github/workflows/validate-application.yml` y se identifica internamente como `Validate-application.yml`. CI y deploy la invocan para evitar duplicar los mismos pasos.
+La validacion reutilizable esta definida en `.github/workflows/validate-application.yml`, con el workflow `validate-application-workflow` y el job `validate-application`. CI la invoca mediante el job `ci-validate-application` y deploy mediante `pre-deploy-validation` para evitar duplicar los mismos pasos.
 
 ### Validacion del nombre de rama
 
 Archivo: `.github/workflows/validate-branch-prefix.yml`
 
-El workflow `validate-branch-prefix.yml` se ejecuta en pull requests hacia `develop`. La rama de origen debe usar uno de estos prefijos:
+El workflow `validate-branch-prefix-workflow` se ejecuta en pull requests hacia `develop`. La rama de origen debe usar uno de estos prefijos:
 
 ```text
 feature/*
@@ -97,7 +97,7 @@ hotfix/*
 El job se llama `validate-branch-prefix`, por lo que el check aparece como:
 
 ```text
-validate-branch-prefix.yml / validate-branch-prefix
+validate-branch-prefix-workflow / validate-branch-prefix
 ```
 
 Ejemplos validos:
@@ -138,7 +138,7 @@ El workflow `deploy-workflow` se ejecuta:
 
 - En el push que GitHub genera despues de fusionar un pull request en `develop`.
 - En el push que GitHub genera despues de fusionar un pull request en `main`.
-- Manualmente mediante `Actions > Deploy environments to GitHub Pages > Run workflow`.
+- Manualmente mediante `Actions > deploy-workflow > Run workflow`, seleccionando `develop` o `main` como rama.
 
 El workflow no distingue si un push fue generado por un merge o por un push directo. Por eso, las reglas de proteccion de `develop` y `main` deben bloquear los pushes directos. El job ejecuta siempre `validate-application.yml` antes de publicar.
 
@@ -195,12 +195,12 @@ En `Settings > Branches` crea una regla o ruleset para `develop` con estas opcio
 - Requerir pull request antes de fusionar.
 - Requerir aprobacion, si hay otro colaborador disponible.
 - Requerir que los checks pasen antes de fusionar.
-- Seleccionar el check `ci-validation / application-validation`.
-- Seleccionar el check `validate-branch-prefix.yml / validate-branch-prefix`.
+- Seleccionar el check `ci-workflow / ci-validate-application`.
+- Seleccionar el check `validate-branch-prefix-workflow / validate-branch-prefix`.
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
-El check `validate-branch-prefix.yml / validate-branch-prefix` aparece despues de crear o actualizar un pull request hacia `develop`. Configuralo como requisito en la regla de `develop`; la regla de proteccion es la que impide realmente los pushes directos.
+El check `validate-branch-prefix-workflow / validate-branch-prefix` aparece despues de crear o actualizar un pull request hacia `develop`. Configuralo como requisito en la regla de `develop`; la regla de proteccion es la que impide realmente los pushes directos.
 
 ### 5. Proteccion de `main`
 
@@ -210,12 +210,12 @@ En `Settings > Branches` crea una regla o ruleset para `main` con estas opciones
 - Requerir al menos una aprobacion.
 - Descartar aprobaciones obsoletas cuando cambien los commits.
 - Requerir que los checks pasen antes de fusionar.
-- Seleccionar el check `ci-validation / application-validation`.
+- Seleccionar el check `ci-workflow / ci-validate-application`.
 - Seleccionar el check `validate-promotion-source-workflow / validate-promotion-source`.
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
-El check `ci-validation / application-validation` puede seleccionarse despues de que el workflow `ci-validation` haya ejecutado al menos una vez en GitHub.
+El check `ci-workflow / ci-validate-application` puede seleccionarse despues de que el workflow `ci-workflow` haya ejecutado al menos una vez en GitHub.
 
 El check `validate-promotion-source-workflow / validate-promotion-source` permite unicamente la promocion `develop -> main`.
 
@@ -223,11 +223,11 @@ El check `validate-promotion-source-workflow / validate-promotion-source` permit
 
 1. Trabaja en una rama `feature/*`.
 2. Abre un pull request hacia `develop`.
-3. Espera a que `ci-validation / application-validation` termine correctamente.
+3. Espera a que `ci-workflow / ci-validate-application` termine correctamente.
 4. Fusiona el pull request en `develop`.
 5. Comprueba staging en `/staging/`.
 6. Abre un pull request desde `develop` hacia `main`.
-7. Espera la aprobacion requerida y el check `ci-validation / application-validation`.
+7. Espera la aprobacion requerida y el check `ci-workflow / ci-validate-application`.
 8. Fusiona el pull request en `main`.
 9. GitHub Actions ejecutara el despliegue de production.
 
@@ -250,7 +250,7 @@ git switch -c feature/nuevo-cambio
 GitHub no permite aprobar el propio pull request. Si el repositorio tiene un unico mantenedor y no hay otro usuario que pueda aprobar, hay dos alternativas:
 
 - Mantener una aprobacion obligatoria y agregar un colaborador con permiso `Write`, `Maintain` o `Admin`.
-- Cambiar el numero de aprobaciones requeridas a `0`, manteniendo obligatorio el check `ci-validation / application-validation`.
+- Cambiar el numero de aprobaciones requeridas a `0`, manteniendo obligatorio el check `ci-workflow / ci-validate-application`.
 
 Para un equipo, se recomienda mantener al menos una aprobacion.
 
