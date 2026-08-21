@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Validate JavaScript
+        run: |
+          node --check environments/staging/script.js
+          node --check environments/production/script.js
+
+      - name: Validate JSON
+        run: |
+          python3 -m json.tool environments/staging/events.json >/dev/null
+          python3 -m json.tool environments/production/events.json >/dev/null
+
+      - name: Verify environment files
+        run: |
+          test -f environments/staging/index.html
+          test -f environments/staging/style.css
+          test -f environments/production/index.html
+          test -f environments/production/style.css

@@ -1,0 +1,23 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+*.swp
+*.swo
+
+# Dependencias y salidas de herramientas
+node_modules/
+dist/
+build/
+.cache/
+
+# Variables de entorno y archivos locales
+.env
+.env.*
+!.env.example
+
+# Configuracion local de VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
