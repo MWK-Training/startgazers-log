@@ -80,6 +80,40 @@ Este job:
 - Valida los dos archivos `events.json`.
 - Comprueba que existan los archivos HTML y CSS de ambos ambientes.
 
+### Validacion del nombre de rama
+
+Archivo: `.github/workflows/branch-name.yml`
+
+El workflow `Validate branch name` se ejecuta en pull requests hacia `develop`. Solo permite ramas de origen con estos prefijos:
+
+```text
+feature/*
+fix/*
+hotfix/*
+```
+
+El job se llama `branch-name`, por lo que el check aparece como:
+
+```text
+Validate branch name / branch-name
+```
+
+Ejemplos validos:
+
+```text
+feature/adding-labels-for-branches
+fix/events-json
+hotfix/production-deploy
+```
+
+Ejemplos no validos:
+
+```text
+bugfix/events-json
+test/experiment
+adding-labels-for-branches
+```
+
 ### Despliegue
 
 Archivo: `.github/workflows/deploy.yml`
@@ -136,7 +170,21 @@ En `Settings > Environments`:
 
 Cuando un despliegue de `main` llegue al job de production, GitHub lo pausara hasta que un revisor lo apruebe.
 
-### 4. Proteccion de `main`
+### 4. Proteccion de `develop`
+
+En `Settings > Branches` crea una regla o ruleset para `develop` con estas opciones:
+
+- Requerir pull request antes de fusionar.
+- Requerir aprobacion, si hay otro colaborador disponible.
+- Requerir que los checks pasen antes de fusionar.
+- Seleccionar el check `CI / validate`.
+- Seleccionar el check `Validate branch name / branch-name`.
+- Bloquear force pushes.
+- Bloquear la eliminacion de la rama.
+
+El check `Validate branch name / branch-name` aparece despues de crear o actualizar un pull request hacia `develop`. Solo permite ramas de origen `feature/*`, `fix/*` y `hotfix/*`.
+
+### 5. Proteccion de `main`
 
 En `Settings > Branches` crea una regla o ruleset para `main` con estas opciones:
 
@@ -161,6 +209,20 @@ El check `CI / validate` puede seleccionarse despues de que el workflow `CI` hay
 7. Espera la aprobacion requerida y el check `CI / validate`.
 8. Fusiona el pull request en `main`.
 9. GitHub Actions ejecutara el despliegue de production.
+
+Despues de fusionar un pull request, actualiza tus referencias locales:
+
+```bash
+git fetch origin
+git switch develop
+git pull origin develop
+```
+
+Para comenzar el siguiente cambio, crea una nueva rama desde `develop`:
+
+```bash
+git switch -c feature/nuevo-cambio
+```
 
 ## Trabajo individual
 
