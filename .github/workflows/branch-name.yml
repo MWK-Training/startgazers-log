@@ -1,4 +1,4 @@
-name: Validate branch name
+name: branch-name.yml
 
 on:
   pull_request:
@@ -10,10 +10,10 @@ permissions:
   pull-requests: read
 
 jobs:
-  branch-name:
+  branch-prefix:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate branch name
+      - name: validate-branch-prefix
         env:
           BRANCH_NAME: ${{ github.head_ref }}
         run: |

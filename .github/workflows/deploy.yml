@@ -1,4 +1,4 @@
-name: Deploy environments to GitHub Pages
+name: deploy-pages
 
 on:
   pull_request:
@@ -15,13 +15,13 @@ permissions:
   id-token: write
 
 jobs:
-  validate:
+  pre-deploy-validation:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     uses: ./.github/workflows/validate.yml
 
   deploy:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
-    needs: validate
+    needs: pre-deploy-validation
     runs-on: ubuntu-latest
     environment:
       name: ${{ (github.event_name == 'workflow_dispatch' && github.ref_name == 'main' || github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main') && 'production' || 'staging' }}
