@@ -170,7 +170,21 @@ En `Settings > Environments`:
 
 Cuando un despliegue de `main` llegue al job de production, GitHub lo pausara hasta que un revisor lo apruebe.
 
-### 4. Proteccion de `main`
+### 4. Proteccion de `develop`
+
+En `Settings > Branches` crea una regla o ruleset para `develop` con estas opciones:
+
+- Requerir pull request antes de fusionar.
+- Requerir aprobacion, si hay otro colaborador disponible.
+- Requerir que los checks pasen antes de fusionar.
+- Seleccionar el check `CI / validate`.
+- Seleccionar el check `Validate branch name / branch-name`.
+- Bloquear force pushes.
+- Bloquear la eliminacion de la rama.
+
+El check `Validate branch name / branch-name` aparece despues de crear o actualizar un pull request hacia `develop`. Solo permite ramas de origen `feature/*`, `fix/*` y `hotfix/*`.
+
+### 5. Proteccion de `main`
 
 En `Settings > Branches` crea una regla o ruleset para `main` con estas opciones:
 
@@ -179,13 +193,10 @@ En `Settings > Branches` crea una regla o ruleset para `main` con estas opciones
 - Descartar aprobaciones obsoletas cuando cambien los commits.
 - Requerir que los checks pasen antes de fusionar.
 - Seleccionar el check `CI / validate`.
-- Seleccionar el check `Validate branch name / branch-name`.
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
 El check `CI / validate` puede seleccionarse despues de que el workflow `CI` haya ejecutado al menos una vez en GitHub.
-
-El check `Validate branch name / branch-name` aparece despues de crear o actualizar un pull request hacia `develop`. Debe configurarse como requisito unicamente en la regla de `develop`.
 
 ## Promover a produccion
 
@@ -198,6 +209,20 @@ El check `Validate branch name / branch-name` aparece despues de crear o actuali
 7. Espera la aprobacion requerida y el check `CI / validate`.
 8. Fusiona el pull request en `main`.
 9. GitHub Actions ejecutara el despliegue de production.
+
+Despues de fusionar un pull request, actualiza tus referencias locales:
+
+```bash
+git fetch origin
+git switch develop
+git pull origin develop
+```
+
+Para comenzar el siguiente cambio, crea una nueva rama desde `develop`:
+
+```bash
+git switch -c feature/nuevo-cambio
+```
 
 ## Trabajo individual
 
