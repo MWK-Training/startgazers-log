@@ -1,4 +1,4 @@
-name: Validate-application.yml
+name: validate-application.yml
 
 on:
   workflow_call:
@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  application-validation:
+  validate-application:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
