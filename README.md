@@ -23,3 +23,5 @@ Para hacer manual la promocion a produccion, configura en GitHub:
 3. Un Environment llamado `staging` sin aprobacion obligatoria.
 
 El workflow de CI valida JavaScript, JSON y la estructura de ambos ambientes en pull requests y pushes.
+
+Intento
