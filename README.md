@@ -14,7 +14,7 @@ El sitio se organiza en dos ambientes dentro de GitHub Pages:
 - `main`: rama de produccion. Se actualiza mediante un pull request aprobado desde `develop` y despliega production.
 - `feature/*`: ramas de trabajo que deben entrar por pull request hacia `develop`.
 
-El workflow de Pages publica ambas carpetas despues de fusionar un pull request. El ambiente de GitHub Actions cambia segun la rama: `staging` para `develop` y `production` para `main`.
+El workflow de Pages publica ambas carpetas en cada `push` a `develop` o `main`, normalmente como resultado de fusionar un pull request. El ambiente de GitHub Actions cambia segun la rama: `staging` para `develop` y `production` para `main`.
 
 Para hacer manual la promocion a produccion, configura en GitHub:
 
