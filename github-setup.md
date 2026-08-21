@@ -134,13 +134,13 @@ Este check debe ser obligatorio en la regla de `main`. De esta forma, un pull re
 
 Archivo: `.github/workflows/deploy.yml`
 
-El workflow `Deploy environments to GitHub Pages` se ejecuta:
+El workflow `deploy-workflow` se ejecuta:
 
-- Cuando un pull request se fusiona en `develop`.
-- Cuando un pull request se fusiona en `main`.
+- En el push que GitHub genera despues de fusionar un pull request en `develop`.
+- En el push que GitHub genera despues de fusionar un pull request en `main`.
 - Manualmente mediante `Actions > Deploy environments to GitHub Pages > Run workflow`.
 
-No se ejecuta por un push directo. La regla de proteccion de la rama debe impedir ese push; si alguien consigue realizarlo, tampoco publicara un ambiente porque el workflow solo acepta pull requests fusionados o una ejecucion manual.
+El workflow no distingue si un push fue generado por un merge o por un push directo. Por eso, las reglas de proteccion de `develop` y `main` deben bloquear los pushes directos. El job ejecuta siempre `validate-application.yml` antes de publicar.
 
 El ambiente de GitHub Actions se selecciona automáticamente:
 
