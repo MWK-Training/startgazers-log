@@ -13,16 +13,16 @@ jobs:
   branch-name:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate source branch
+      - name: Validate branch name
         env:
-          SOURCE_BRANCH: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.head_ref }}
         run: |
-          if [[ "$SOURCE_BRANCH" != feature/* &&
-                "$SOURCE_BRANCH" != fix/* &&
-                "$SOURCE_BRANCH" != hotfix/* ]]; then
-            echo "Invalid source branch name: $SOURCE_BRANCH"
+          if [[ "$BRANCH_NAME" != feature/* &&
+                "$BRANCH_NAME" != fix/* &&
+                "$BRANCH_NAME" != hotfix/* ]]; then
+            echo "Invalid branch name: $BRANCH_NAME"
             echo "Use feature/*, fix/* or hotfix/*"
             exit 1
           fi
 
-          echo "Valid source branch name: $SOURCE_BRANCH"
+          echo "Valid branch name: $BRANCH_NAME"

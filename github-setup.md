@@ -84,7 +84,7 @@ Este job:
 
 Archivo: `.github/workflows/branch-name.yml`
 
-El workflow `Validate branch name` se ejecuta en pull requests hacia `develop`. Solo permite ramas de origen con estos prefijos:
+El workflow `Validate branch name` se ejecuta en pull requests hacia `develop`. La rama de origen debe usar uno de estos prefijos:
 
 ```text
 feature/*
@@ -120,9 +120,11 @@ Archivo: `.github/workflows/deploy.yml`
 
 El workflow `Deploy environments to GitHub Pages` se ejecuta:
 
-- En cada push a `develop`.
-- En cada push a `main`.
+- Cuando un pull request se fusiona en `develop`.
+- Cuando un pull request se fusiona en `main`.
 - Manualmente mediante `Actions > Deploy environments to GitHub Pages > Run workflow`.
+
+No se ejecuta por un push directo. La regla de proteccion de la rama debe impedir ese push; si alguien consigue realizarlo, tampoco publicara un ambiente porque el workflow solo acepta pull requests fusionados o una ejecucion manual.
 
 El ambiente de GitHub Actions se selecciona automáticamente:
 
@@ -182,7 +184,7 @@ En `Settings > Branches` crea una regla o ruleset para `develop` con estas opcio
 - Bloquear force pushes.
 - Bloquear la eliminacion de la rama.
 
-El check `Validate branch name / branch-name` aparece despues de crear o actualizar un pull request hacia `develop`. Solo permite ramas de origen `feature/*`, `fix/*` y `hotfix/*`.
+El check `Validate branch name / branch-name` aparece despues de crear o actualizar un pull request hacia `develop`. Configuralo como requisito en la regla de `develop`; la regla de proteccion es la que impide realmente los pushes directos.
 
 ### 5. Proteccion de `main`
 
